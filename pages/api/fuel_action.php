@@ -112,7 +112,7 @@ try {
             $liters        = $_POST['liters'] ?? 0;
             $price_per_liter = $_POST['price_per_liter'] ?? 0;
             $total_cost    = $_POST['total_cost'] ?? 0;
-            $mileage       = $_POST['mileage'] ?? null;
+            $mileage = $_POST['mileage'] !== '' ? intval($_POST['mileage']) : null;
             $station_name  = $_POST['station_name'] ?? '';
             $note          = $_POST['note'] ?? '';
             $created_by    = $_SESSION['username'] ?? 'Unknown';
@@ -125,7 +125,7 @@ try {
             // Upload bill image
             $bill_image = '';
             if (isset($_FILES['bill_image']) && $_FILES['bill_image']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../../uploads/bills/';
+                $uploadDir = __DIR__ . '/../../uploads/fuel/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
@@ -180,7 +180,7 @@ try {
             $liters = floatval($_POST['liters'] ?? 0);
             $price_per_liter = floatval($_POST['price_per_liter'] ?? 0);
             $total_cost = floatval($_POST['total_cost'] ?? 0);
-            $mileage = $_POST['mileage'] ?? null;
+            $mileage = $_POST['mileage'] !== '' ? intval($_POST['mileage']) : null;
             $station_name = $_POST['station_name'] ?? '';
             $note = $_POST['note'] ?? '';
 
@@ -239,7 +239,7 @@ try {
             $record = $stmt->fetch();
             
             if ($record && $record['bill_image']) {
-                $file = __DIR__ . '/../uploads/bills/' . $record['bill_image'];
+                $file = __DIR__ . '/../../uploads/fuel/' . $record['bill_image'];
                 if (file_exists($file)) {
                     unlink($file);
                 }
