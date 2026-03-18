@@ -197,8 +197,6 @@ function openEditModal(data) {
         $('#placeholderIcon').removeClass('d-none');
     }
     
-    }
-    
     vehicleModal.show();
 }
 

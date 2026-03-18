@@ -125,7 +125,7 @@ try {
             // Upload bill image
             $bill_image = '';
             if (isset($_FILES['bill_image']) && $_FILES['bill_image']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../uploads/bills/';
+                $uploadDir = __DIR__ . '/../../uploads/bills/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
@@ -166,7 +166,7 @@ try {
             ]);
 
             // แจ้งเตือน Telegram
-            sendFuelTelegram($conn_oil, $conn, 'add', $_POST);
+            sendFuelTelegram($conn_kkdoc, $conn, 'add', $_POST);
 
             echo json_encode(['status' => 'success', 'message' => 'บันทึกข้อมูลสำเร็จ', 'id' => $conn_oil->lastInsertId()]);
             break;
@@ -218,7 +218,7 @@ try {
             ]);
 
             // แจ้งเตือน Telegram
-            sendFuelTelegram($conn_oil, $conn, 'edit', $_POST);
+            sendFuelTelegram($conn_kkdoc, $conn, 'edit', $_POST);
 
             echo json_encode(['status' => 'success', 'message' => 'แก้ไขข้อมูลสำเร็จ']);
             break;
@@ -423,18 +423,18 @@ function handleUpload($file, $prefix) {
 /**
  * ฟังก์ชันแจ้งเตือนผ่าน Telegram
  */
-function sendFuelTelegram($conn_oil, $conn, $action_name, $data) {
+function sendFuelTelegram($conn_kkdoc, $conn, $action_name, $data) {
     try {
         $tg = null;
         // พยายามดึงจาก DB_OIL ก่อน ถ้าไม่มีให้ไปหาใน DB_MAIN
         try {
-            $stmt = $conn_oil->query("SELECT bot_token, chat_id FROM telegram LIMIT 1");
+            $stmt = $conn_kkdoc->query("SELECT bot_token, chat_id FROM telegram LIMIT 1 where bot_name = 'sukree'");
             if ($stmt) $tg = $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (Exception $e) {}
         
         if (!$tg) {
             try {
-                $stmt = $conn->query("SELECT bot_token, chat_id FROM telegram LIMIT 1");
+                $stmt = $conn->query("SELECT bot_token, chat_id FROM telegram LIMIT 1 where bot_name = 'sukree'");
                 if ($stmt) $tg = $stmt->fetch(PDO::FETCH_ASSOC);
             } catch (Exception $e) {}
         }

@@ -183,8 +183,6 @@ function openEditModal(data) {
         $('#placeholderIcon').removeClass('d-none');
     }
     
-    }
-    
     driverModal.show();
 }
 
