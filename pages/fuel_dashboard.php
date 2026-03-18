@@ -126,15 +126,14 @@ requireLogin();
 <!-- ============================================ -->
 <div class="modal fade" id="addRecordModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
+        <form class="modal-content" id="fuelForm" enctype="multipart/form-data">
             <div class="modal-header">
                 <h5 class="modal-title" id="fuelModalTitle"><i class="fas fa-gas-pump me-2"></i>บันทึกเติมน้ำมัน</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="fuelForm" enctype="multipart/form-data">
-                <input type="hidden" name="action" id="fuelAction" value="add_record">
-                <input type="hidden" name="id" id="fuelId">
-                <div class="modal-body">
+            <input type="hidden" name="action" id="fuelAction" value="add_record">
+            <input type="hidden" name="id" id="fuelId">
+            <div class="modal-body">
                     
                     <div class="row g-3">
                         <!-- รถ -->
@@ -245,6 +244,7 @@ requireLogin();
                     </div>
 
                 </div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i>ยกเลิก
@@ -253,8 +253,7 @@ requireLogin();
                         <i class="fas fa-save me-1"></i>บันทึกข้อมูล
                     </button>
                 </div>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -293,13 +292,19 @@ requireLogin();
 
 <script>
 const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
-const BILL_PATH = '/ok/kch-oil/pages/uploads/bills/';
+const BILL_PATH = '/ok/kch-oil/uploads/fuel/';
 let fuelTable;
+let addRecordModal, detailModal, viewBillModal;
 
 // ============================================
 // Initialize
 // ============================================
 $(document).ready(function() {
+    // Initialize Bootstrap Modals
+    addRecordModal = new bootstrap.Modal(document.getElementById('addRecordModal'));
+    detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+    viewBillModal = new bootstrap.Modal(document.getElementById('viewBillModal'));
+
     loadVehicles();
     loadDrivers();
     loadSummary();
@@ -525,7 +530,7 @@ function openEditRecord(data) {
         clearImagePreview();
     }
     
-    $('#addRecordModal').modal('show');
+    addRecordModal.show();
 }
 
 function openViewRecord(data) {
@@ -552,7 +557,7 @@ function openViewRecord(data) {
         ` : ''}
     `;
     $('#detailContent').html(table);
-    $('#detailModal').modal('show');
+    detailModal.show();
 }
 
 // ============================================
@@ -581,7 +586,7 @@ function submitFuelRecord() {
                     timer: 1500,
                     showConfirmButton: false
                 });
-                $('#addRecordModal').modal('hide');
+                addRecordModal.hide();
                 resetForm();
                 fuelTable.ajax.reload();
                 loadSummary();
@@ -606,7 +611,8 @@ function openAddRecord() {
     $('#fuel_date').val(new Date().toISOString().split('T')[0]);
     $('#vehicleSelect, #driverSelect').val('').trigger('change.select2');
     clearImagePreview();
-    $('#addRecordModal').modal('show');
+    
+    addRecordModal.show();
 }
 
 // ============================================
@@ -643,7 +649,7 @@ function deleteRecord(id) {
 // ============================================
 function viewBill(filename) {
     $('#viewBillImage').attr('src', BILL_PATH + filename);
-    new bootstrap.Modal(document.getElementById('viewBillModal')).show();
+    viewBillModal.show();
 }
 
 // ============================================

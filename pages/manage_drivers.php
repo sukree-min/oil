@@ -50,16 +50,15 @@ requireRole(['1','5','6']);
 
 <!-- Modal: เพิ่ม/แก้ไขคนขับ -->
 <div class="modal fade" id="driverModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <form class="modal-content" id="driverForm" enctype="multipart/form-data">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalTitle">เพิ่มคนขับใหม่</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="driverForm" enctype="multipart/form-data">
-                <input type="hidden" name="action" id="formAction" value="add_driver">
-                <input type="hidden" name="id" id="driverId">
-                <div class="modal-body">
+            <input type="hidden" name="action" id="formAction" value="add_driver">
+            <input type="hidden" name="id" id="driverId">
+            <div class="modal-body">
                     <div class="text-center mb-3">
                         <div id="imagePlaceholder" class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 120px; height: 120px; cursor: pointer; overflow: hidden;" onclick="$('#dImage').click()">
                             <i class="fas fa-user fa-3x text-secondary" id="placeholderIcon"></i>
@@ -81,16 +80,19 @@ requireRole(['1','5','6']);
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
                     <button type="submit" class="btn btn-fuel">บันทึกข้อมูล</button>
                 </div>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
 
 <script>
 const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
 let driverTable;
+let driverModal;
 
 $(document).ready(function() {
+    // Initialize Modal
+    driverModal = new bootstrap.Modal(document.getElementById('driverModal'));
+    
     initTable();
 
     $('#driverForm').on('submit', function(e) {
@@ -181,7 +183,9 @@ function openEditModal(data) {
         $('#placeholderIcon').removeClass('d-none');
     }
     
-    $('#driverModal').modal('show');
+    }
+    
+    driverModal.show();
 }
 
 function saveDriver() {
@@ -196,7 +200,7 @@ function saveDriver() {
         success: function(res) {
             if (res.status === 'success') {
                 Swal.fire({ icon: 'success', title: 'สำเร็จ', text: res.message, timer: 1500, showConfirmButton: false });
-                $('#driverModal').modal('hide');
+                driverModal.hide();
                 driverTable.ajax.reload();
             } else {
                 Swal.fire('ผิดพลาด', res.message, 'error');

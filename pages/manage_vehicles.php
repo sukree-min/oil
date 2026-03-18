@@ -51,16 +51,15 @@ requireRole(['1','5','6']);
 
 <!-- Modal: เพิ่ม/แก้ไขรถ -->
 <div class="modal fade" id="vehicleModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <form class="modal-content" id="vehicleForm" enctype="multipart/form-data">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalTitle">เพิ่มรถใหม่</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="vehicleForm" enctype="multipart/form-data">
-                <input type="hidden" name="action" id="formAction" value="add_vehicle">
-                <input type="hidden" name="id" id="vehicleId">
-                <div class="modal-body">
+            <input type="hidden" name="action" id="formAction" value="add_vehicle">
+            <input type="hidden" name="id" id="vehicleId">
+            <div class="modal-body">
                     <div class="text-center mb-3">
                         <div id="imagePlaceholder" class="rounded bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 200px; height: 120px; cursor: pointer; overflow: hidden;" onclick="$('#vImage').click()">
                             <i class="fas fa-car fa-3x text-secondary" id="placeholderIcon"></i>
@@ -93,16 +92,19 @@ requireRole(['1','5','6']);
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
                     <button type="submit" class="btn btn-fuel">บันทึกข้อมูล</button>
                 </div>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
 
 <script>
 const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
 let vehicleTable;
+let vehicleModal;
 
 $(document).ready(function() {
+    // Initialize Modal
+    vehicleModal = new bootstrap.Modal(document.getElementById('vehicleModal'));
+    
     initTable();
 
     $('#vehicleForm').on('submit', function(e) {
@@ -195,7 +197,9 @@ function openEditModal(data) {
         $('#placeholderIcon').removeClass('d-none');
     }
     
-    $('#vehicleModal').modal('show');
+    }
+    
+    vehicleModal.show();
 }
 
 function saveVehicle() {
@@ -210,7 +214,7 @@ function saveVehicle() {
         success: function(res) {
             if (res.status === 'success') {
                 Swal.fire({ icon: 'success', title: 'สำเร็จ', text: res.message, timer: 1500, showConfirmButton: false });
-                $('#vehicleModal').modal('hide');
+                vehicleModal.hide();
                 vehicleTable.ajax.reload();
             } else {
                 Swal.fire('ผิดพลาด', res.message, 'error');
