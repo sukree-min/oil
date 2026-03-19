@@ -165,6 +165,10 @@ try {
                 $mileage ?: null, $station_name, $bill_image, $note, $created_by
             ]);
 
+            // หักยอดเงินจากกระเป๋ารถ
+            $stmt_wallet = $conn_oil->prepare("UPDATE oil_vehicles SET current_balance = current_balance - ? WHERE id = ?");
+            $stmt_wallet->execute([$total_cost, $vehicle_id]);
+
             // แจ้งเตือน Telegram
             sendFuelTelegram($conn_kkdoc, $conn, 'add', $_POST);
 
@@ -188,6 +192,11 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'ข้อมูลไม่ครบถ้วน']);
                 exit;
             }
+
+            // Fetch old record for balance calculation
+            $stmt_old = $conn_oil->prepare("SELECT vehicle_id, total_cost FROM oil_fuel_records WHERE id = ?");
+            $stmt_old->execute([$id]);
+            $old_record = $stmt_old->fetch(PDO::FETCH_ASSOC);
 
             // จัดการรูปภาพบิลเดิม
             $stmt = $conn_oil->prepare("SELECT bill_image FROM oil_fuel_records WHERE id = ?");
@@ -217,6 +226,21 @@ try {
                 $station_name, $bill_image, $note, $id
             ]);
 
+            // Adjust balances
+            if ($old_record && $old_record['vehicle_id'] == $vehicle_id) {
+                $diff = floatval($total_cost) - floatval($old_record['total_cost']);
+                if ($diff != 0) {
+                    $stmt_wallet = $conn_oil->prepare("UPDATE oil_vehicles SET current_balance = current_balance - ? WHERE id = ?");
+                    $stmt_wallet->execute([$diff, $vehicle_id]);
+                }
+            } elseif ($old_record) {
+                $stmt_refund = $conn_oil->prepare("UPDATE oil_vehicles SET current_balance = current_balance + ? WHERE id = ?");
+                $stmt_refund->execute([$old_record['total_cost'], $old_record['vehicle_id']]);
+                
+                $stmt_deduct = $conn_oil->prepare("UPDATE oil_vehicles SET current_balance = current_balance - ? WHERE id = ?");
+                $stmt_deduct->execute([$total_cost, $vehicle_id]);
+            }
+
             // แจ้งเตือน Telegram
             sendFuelTelegram($conn_kkdoc, $conn, 'edit', $_POST);
 
@@ -233,15 +257,21 @@ try {
                 exit;
             }
 
-            // Delete bill image file
-            $stmt = $conn_oil->prepare("SELECT bill_image FROM oil_fuel_records WHERE id = ?");
+            // Delete bill image file and Refund balance
+            $stmt = $conn_oil->prepare("SELECT vehicle_id, total_cost, bill_image FROM oil_fuel_records WHERE id = ?");
             $stmt->execute([$id]);
             $record = $stmt->fetch();
             
-            if ($record && $record['bill_image']) {
-                $file = __DIR__ . '/../../uploads/fuel/' . $record['bill_image'];
-                if (file_exists($file)) {
-                    unlink($file);
+            if ($record) {
+                // Refund balance
+                $stmt_refund = $conn_oil->prepare("UPDATE oil_vehicles SET current_balance = current_balance + ? WHERE id = ?");
+                $stmt_refund->execute([$record['total_cost'], $record['vehicle_id']]);
+                
+                if ($record['bill_image']) {
+                    $file = __DIR__ . '/../../uploads/fuel/' . $record['bill_image'];
+                    if (file_exists($file)) {
+                        unlink($file);
+                    }
                 }
             }
 
@@ -249,6 +279,26 @@ try {
             $stmt->execute([$id]);
             
             echo json_encode(['status' => 'success', 'message' => 'ลบรายการสำเร็จ']);
+            break;
+
+        // ============================================
+        // จัดการกระเป๋าเงินรถ (Wallet)
+        // ============================================
+        case 'add_fund':
+            $vehicle_id = $_POST['vehicle_id'] ?? '';
+            $amount = floatval($_POST['amount'] ?? 0);
+            
+            if (!$vehicle_id || $amount == 0) {
+                echo json_encode(['status' => 'error', 'message' => 'กรุณาระบุข้อมูลให้ครบถ้วนและจำนวนเงินต้องไม่เป็น 0']);
+                exit;
+            }
+            
+            $stmt = $conn_oil->prepare("UPDATE oil_vehicles SET current_balance = current_balance + ? WHERE id = ?");
+            if ($stmt->execute([$amount, $vehicle_id])) {
+                echo json_encode(['status' => 'success', 'message' => 'ปรับปรุงยอดเงินสำเร็จ']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถปรับปรุงยอดเงินได้']);
+            }
             break;
 
         // ============================================
