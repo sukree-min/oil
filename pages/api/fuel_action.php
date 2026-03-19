@@ -425,21 +425,7 @@ function handleUpload($file, $prefix) {
  */
 function sendFuelTelegram($conn_kkdoc, $conn, $action_name, $data) {
     try {
-        $tg = null;
-        // พยายามดึงจาก DB_OIL ก่อน ถ้าไม่มีให้ไปหาใน DB_MAIN
-        try {
-            $stmt = $conn_kkdoc->query("SELECT bot_token, chat_id FROM telegram LIMIT 1 where bot_name = 'sukree'");
-            if ($stmt) $tg = $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {}
-        
-        if (!$tg) {
-            try {
-                $stmt = $conn->query("SELECT bot_token, chat_id FROM telegram LIMIT 1 where bot_name = 'sukree'");
-                if ($stmt) $tg = $stmt->fetch(PDO::FETCH_ASSOC);
-            } catch (Exception $e) {}
-        }
-
-        if (!$tg || empty($tg['bot_token']) || empty($tg['chat_id'])) return false;
+        global $conn_oil;
 
         // Get Vehicle Name
         $stmt = $conn_oil->prepare("SELECT plate_number, vehicle_name FROM oil_vehicles WHERE id = ?");
@@ -492,21 +478,9 @@ function sendFuelTelegram($conn_kkdoc, $conn, $action_name, $data) {
         
         $msg .= "\n🙋‍♂️ <b>ผู้บันทึก:</b> " . htmlspecialchars($_SESSION['username'] ?? 'Unknown');
 
-        $url = "https://api.telegram.org/bot" . $tg['bot_token'] . "/sendMessage";
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
-            'chat_id' => $tg['chat_id'],
-            'text' => $msg,
-            'parse_mode' => 'HTML'
-        ]));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_exec($ch);
-        curl_close($ch);
+        // เรียกใช้ฟังก์ชันส่ง Telegram ที่แยกไว้
+        require_once __DIR__ . '/../telegram_notify.php';
+        sendTelegramNotification($msg, $conn);
 
         return true;
     } catch (Exception $e) {
