@@ -511,7 +511,7 @@ function sendFuelTelegram($conn_kkdoc, $conn, $action_name, $data) {
         }
         
         if (!empty($data['price_per_liter'])) {
-            $msg .= "🏷 <b>ราคา/ลิตร:</b> " . number_format($data['price_per_liter'], 3) . " บาท\n";
+            $msg .= "🏷 <b>ราคา/ลิตร:</b> " . number_format($data['price_per_liter'], 2) . " บาท\n";
         }
         
         $msg .= "💰 <b>ยอดรวม:</b> <b>" . number_format($data['total_cost'], 2) . " บาท</b>\n";

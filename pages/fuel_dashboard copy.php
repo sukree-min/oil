@@ -190,7 +190,7 @@ requireLogin();
                             <label class="form-label fw-semibold">
                                 <i class="fas fa-tag text-secondary me-1"></i>ราคาต่อลิตร (บาท)
                             </label>
-                            <input type="number" name="price_per_liter" id="inputPrice" class="form-control" step="0.001" min="0" placeholder="0.000">
+                            <input type="number" name="price_per_liter" id="inputPrice" class="form-control" step="0.01" min="0" placeholder="0.00">
                         </div>
                         <!-- ยอดรวม -->
                         <div class="col-md-4">
@@ -664,7 +664,7 @@ function clearImagePreview() {
 // Utilities
 // ============================================
 function numberFormat(num) {
-    return parseFloat(num || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+    return parseFloat(num || 0).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
 function formatThaiDate(dateStr) {
