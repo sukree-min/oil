@@ -285,6 +285,10 @@ try {
         // จัดการกระเป๋าเงินรถ (Wallet)
         // ============================================
         case 'add_fund':
+            if (!isset($_SESSION['role_id']) || !in_array(strval($_SESSION['role_id']), ['1', '5', '6'])) {
+                echo json_encode(['status' => 'error', 'message' => 'คุณไม่มีสิทธิ์ทำรายการนี้']);
+                exit;
+            }
             $vehicle_id = $_POST['vehicle_id'] ?? '';
             $amount = floatval($_POST['amount'] ?? 0);
             
