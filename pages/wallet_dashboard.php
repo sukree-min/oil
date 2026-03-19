@@ -109,9 +109,11 @@ $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span><?= number_format($balance, 2) ?></span>
                         <span class="currency-label">บาท</span>
                     </div>
+                    <?php if ($_SESSION['role'] == '1' || $_SESSION['role'] == '2'): ?>
                     <button class="btn btn-fuel w-100 mt-3" onclick="openTopupModal(<?= $v['id'] ?>, '<?= htmlspecialchars($v['plate_number']) ?>')">
                         <i class="fas fa-coins me-2"></i>จัดการยอดเงิน
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -202,6 +204,6 @@ $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 </script>
 
-<?php require_once '../includes/footer.php'; ?>
+<!-- <?php require_once '../includes/footer.php'; ?> -->
 </body>
 </html>
