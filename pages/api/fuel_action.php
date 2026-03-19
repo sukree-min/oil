@@ -480,7 +480,7 @@ function sendFuelTelegram($conn_kkdoc, $conn, $action_name, $data) {
 
         // เรียกใช้ฟังก์ชันส่ง Telegram ที่แยกไว้
         require_once __DIR__ . '/../telegram_notify.php';
-        sendTelegramNotification($msg, $conn);
+        sendTelegramNotification($msg, $conn_kkdoc);
 
         return true;
     } catch (Exception $e) {
