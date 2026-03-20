@@ -299,6 +299,9 @@ try {
             
             $stmt = $conn_oil->prepare("UPDATE oil_vehicles SET current_balance = current_balance + ? WHERE id = ?");
             if ($stmt->execute([$amount, $vehicle_id])) {
+                // แจ้งเตือน Telegram สำหรับการจัดการยอดเงิน
+                sendWalletTelegram($conn_kkdoc, $conn, $vehicle_id, $amount, $_POST['note'] ?? '');
+                
                 echo json_encode(['status' => 'success', 'message' => 'ปรับปรุงยอดเงินสำเร็จ']);
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถปรับปรุงยอดเงินได้']);
@@ -531,6 +534,49 @@ function sendFuelTelegram($conn_kkdoc, $conn, $action_name, $data) {
         }
         
         $msg .= "\n🙋‍♂️ <b>ผู้บันทึก:</b> " . htmlspecialchars($_SESSION['username'] ?? 'Unknown');
+
+        // เรียกใช้ฟังก์ชันส่ง Telegram ที่แยกไว้
+        require_once __DIR__ . '/../telegram_notify.php';
+        sendTelegramNotification($msg, $conn_kkdoc);
+
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * ฟังก์ชันแจ้งเตือนการจัดการยอดเงินผ่าน Telegram
+ */
+function sendWalletTelegram($conn_kkdoc, $conn, $vehicle_id, $amount, $note) {
+    try {
+        global $conn_oil;
+
+        // Get Vehicle Details
+        $stmt = $conn_oil->prepare("SELECT plate_number, vehicle_name, current_balance FROM oil_vehicles WHERE id = ?");
+        $stmt->execute([$vehicle_id]);
+        $v = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$v) return false;
+
+        $vehicle_text = $v['plate_number'] . (!empty($v['vehicle_name']) ? " ({$v['vehicle_name']})" : "");
+        $current_balance = floatval($v['current_balance']);
+
+        $msg = "";
+        if ($amount > 0) {
+            $msg .= "💰 <b>แจ้งเตือนเติมเงิน/เพิ่มยอดเงินรถ</b>\n\n";
+        } else {
+            $msg .= "📉 <b>แจ้งเตือนปรับลด/แก้ไขยอดเงินรถ</b>\n\n";
+        }
+
+        $msg .= "🚗 <b>รถ:</b> " . htmlspecialchars($vehicle_text) . "\n";
+        $msg .= "💵 <b>จำนวนที่ปรับ:</b> <b>" . number_format($amount, 2) . " บาท</b>\n";
+        $msg .= "🏦 <b>ยอดคงเหลือล่าสุด:</b> <b>" . number_format($current_balance, 2) . " บาท</b>\n";
+        
+        if (!empty($note)) {
+            $msg .= "📝 <b>หมายเหตุ:</b> " . htmlspecialchars($note) . "\n";
+        }
+        
+        $msg .= "\n🙋‍♂️ <b>ผู้ดำเนินการ:</b> " . htmlspecialchars($_SESSION['username'] ?? 'Unknown');
 
         // เรียกใช้ฟังก์ชันส่ง Telegram ที่แยกไว้
         require_once __DIR__ . '/../telegram_notify.php';
