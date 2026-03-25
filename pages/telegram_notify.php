@@ -4,7 +4,7 @@
 function sendTelegramNotification($message, $conn) {
     try {
         // Fetch Telegram configs (Filtered by 'sukree' as requested)
-        $stmt = $conn->query("SELECT bot_token, chat_id, bot_name FROM telegram WHERE bot_name IN ('sukree', '1', '1')");
+        $stmt = $conn->query("SELECT bot_token, chat_id, bot_name FROM telegram WHERE bot_name IN ('oil', '1')");
         $configs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (empty($configs)) return;

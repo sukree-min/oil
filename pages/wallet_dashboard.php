@@ -11,7 +11,7 @@ $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="th">
 <head>
     <?php require_once '../includes/head.php'; ?>
-    <link rel="stylesheet" href="/ok/kch-oil/assets/css/fuel-theme.css">
+    <link rel="stylesheet" href="/kch-oil/assets/css/fuel-theme.css">
     <style>
         .wallet-card {
             border: none;
@@ -88,7 +88,7 @@ $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php foreach ($vehicles as $v): 
             $balance = floatval($v['current_balance']);
             $balanceClass = $balance > 0 ? 'balance-positive' : ($balance < 0 ? 'balance-negative' : 'balance-zero');
-            $imgSrc = !empty($v['image']) ? '/ok/kch-oil/uploads/fuel/' . htmlspecialchars($v['image']) : '';
+            $imgSrc = !empty($v['image']) ? '/kch-oil/uploads/fuel/' . htmlspecialchars($v['image']) : '';
         ?>
         <div class="col">
             <div class="wallet-card h-100">
@@ -109,7 +109,7 @@ $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span><?= number_format($balance, 2) ?></span>
                         <span class="currency-label">บาท</span>
                     </div>
-                    <?php if (isset($_SESSION['role_id']) && in_array(strval($_SESSION['role_id']), ['1', '5'])): ?>
+                    <?php if (isset($_SESSION['role_name']) && in_array(strval($_SESSION['role_name']), ['admin', 'pur'])): ?>
                     <button class="btn btn-fuel w-100 mt-3" onclick="openTopupModal(<?= $v['id'] ?>, '<?= htmlspecialchars($v['plate_number']) ?>')">
                         <i class="fas fa-coins me-2"></i>จัดการยอดเงิน
                     </button>
@@ -158,7 +158,7 @@ $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-    const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
+    const API_URL = '/kch-oil/pages/api/fuel_action.php';
     let topupModalObj;
 
     $(document).ready(function() {

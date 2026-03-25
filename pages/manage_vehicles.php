@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/auth_session.php';
 require_once __DIR__ . '/../includes/config.php';
-requireRole(['1','5','6']);
+requireRole(['admin','pkr']);
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <?php require_once '../includes/head.php'; ?>
-    <link rel="stylesheet" href="/ok/kch-oil/assets/css/fuel-theme.css">
+    <link rel="stylesheet" href="/kch-oil/assets/css/fuel-theme.css">
 </head>
 <body>
 <?php require_once '../includes/nav.php'; ?>
@@ -97,7 +97,7 @@ requireRole(['1','5','6']);
 </div>
 
 <script>
-const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
+const API_URL = '/kch-oil/pages/api/fuel_action.php';
 let vehicleTable;
 let vehicleModal;
 
@@ -125,7 +125,7 @@ function initTable() {
             { data: 'plate_number', className: 'fw-bold' },
             { data: 'image', render: function(d) {
                 if (d) {
-                    const img = `/ok/kch-oil/uploads/fuel/${d}`;
+                    const img = `/kch-oil/uploads/fuel/${d}`;
                     return `<img src="${img}" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;" onclick="viewImage('${img}')">`;
                 }
                 return `<div class="rounded bg-light d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px;"><i class="fas fa-car text-secondary" style="font-size: 14px;"></i></div>`;
@@ -190,7 +190,7 @@ function openEditModal(data) {
     $('#vehicleType').val(data.vehicle_type);
     
     if (data.image) {
-        $('#imagePreview').attr('src', `/ok/kch-oil/uploads/fuel/${data.image}`).removeClass('d-none');
+        $('#imagePreview').attr('src', `/kch-oil/uploads/fuel/${data.image}`).removeClass('d-none');
         $('#placeholderIcon').addClass('d-none');
     } else {
         $('#imagePreview').addClass('d-none');

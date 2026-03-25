@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/auth_session.php';
 require_once __DIR__ . '/../includes/config.php';
-requireRole(['1','5','6']);
+requireRole(['admin','pkr']);
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <?php require_once '../includes/head.php'; ?>
-    <link rel="stylesheet" href="/ok/kch-oil/assets/css/fuel-theme.css">
+    <link rel="stylesheet" href="/kch-oil/assets/css/fuel-theme.css">
 </head>
 <body>
 <?php require_once '../includes/nav.php'; ?>
@@ -85,7 +85,7 @@ requireRole(['1','5','6']);
 </div>
 
 <script>
-const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
+const API_URL = '/kch-oil/pages/api/fuel_action.php';
 let driverTable;
 let driverModal;
 
@@ -112,7 +112,7 @@ function initTable() {
             { data: null, render: (d, t, r, m) => m.row + 1 },
             { data: 'image', render: function(d) {
                 if (d) {
-                    const img = `/ok/kch-oil/uploads/fuel/${d}`;
+                    const img = `/kch-oil/uploads/fuel/${d}`;
                     return `<img src="${img}" class="rounded-circle shadow-sm" style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;" onclick="viewImage('${img}')">`;
                 }
                 return `<div class="rounded-circle bg-light d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;"><i class="fas fa-user text-secondary" style="font-size: 12px;"></i></div>`;
@@ -176,7 +176,7 @@ function openEditModal(data) {
     $('#phone').val(data.phone);
     
     if (data.image) {
-        $('#imagePreview').attr('src', `/ok/kch-oil/uploads/fuel/${data.image}`).removeClass('d-none');
+        $('#imagePreview').attr('src', `/kch-oil/uploads/fuel/${data.image}`).removeClass('d-none');
         $('#placeholderIcon').addClass('d-none');
     } else {
         $('#imagePreview').addClass('d-none');

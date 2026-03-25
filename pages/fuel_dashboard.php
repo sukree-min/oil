@@ -1,17 +1,18 @@
 <?php
 require_once __DIR__ . '/../includes/auth_session.php';
 require_once __DIR__ . '/../includes/config.php';
-requireLogin();
 
+requireLogin();
 // ดึงสิทธิ์ผู้ใช้
 $userRole = $_SESSION['role_name'] ?? '';
 $canEditDelete = in_array($userRole, ['admin', 'pkr']);
 ?>
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <?php require_once '../includes/head.php'; ?>
-    <link rel="stylesheet" href="/ok/kch-oil/assets/css/fuel-theme.css">
+    <link rel="stylesheet" href="/kch-oil/assets/css/fuel-theme.css">
 </head>
 <body>
 <?php require_once '../includes/nav.php'; ?>
@@ -28,8 +29,7 @@ $canEditDelete = in_array($userRole, ['admin', 'pkr']);
             <button class="btn btn-fuel-accent btn-lg" onclick="openAddRecord()">
                 <i class="fas fa-plus-circle me-2"></i>บันทึกเติมน้ำมัน
             </button>
-            <?php endif; ?>
-        </div>
+            <?php endif; ?>  </div>
     </div>
 </div>
 
@@ -296,8 +296,8 @@ $canEditDelete = in_array($userRole, ['admin', 'pkr']);
 </div>
 
 <script>
-const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
-const BILL_PATH = '/ok/kch-oil/uploads/fuel/';
+const API_URL = '/kch-oil/pages/api/fuel_action.php';
+const BILL_PATH = '/kch-oil/uploads/fuel/';
 const CAN_EDIT_DELETE = <?php echo $canEditDelete ? 'true' : 'false'; ?>;
 let fuelTable;
 let addRecordModal, detailModal, viewBillModal;
@@ -474,8 +474,7 @@ function initDataTable() {
                 }
                 
                 buttons += `</div>`;
-                return buttons;
-            }}
+                return buttons;            }}
         ],
         responsive: true,
         order: [[1, 'desc']],
