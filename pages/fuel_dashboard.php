@@ -2,6 +2,10 @@
 require_once __DIR__ . '/../includes/auth_session.php';
 require_once __DIR__ . '/../includes/config.php';
 requireLogin();
+
+// ดึงสิทธิ์ผู้ใช้
+$userRole = $_SESSION['role_name'] ?? '';
+$canEditDelete = in_array($userRole, ['admin', 'pkr']);
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -17,12 +21,14 @@ requireLogin();
     <div class="container">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
-                <h1><i class="fas fa-gas-pump me-2"></i>ระบบบันทึกค่าใช้จ่ายเติมน้ำมัน</h1>
+                <h1><i class="fas fa-gas-pump me-2"></i>ระบบบันทึกค่าใช้จ่ายเติมน้ำมัน รพ.เกาะจันทร์</h1>
                 <p>บันทึก ติดตาม และจัดการค่าใช้จ่ายน้ำมันรถทุกคัน</p>
             </div>
+            <?php if ($canEditDelete): ?>
             <button class="btn btn-fuel-accent btn-lg" onclick="openAddRecord()">
                 <i class="fas fa-plus-circle me-2"></i>บันทึกเติมน้ำมัน
             </button>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -292,6 +298,7 @@ requireLogin();
 <script>
 const API_URL = '/ok/kch-oil/pages/api/fuel_action.php';
 const BILL_PATH = '/ok/kch-oil/uploads/fuel/';
+const CAN_EDIT_DELETE = <?php echo $canEditDelete ? 'true' : 'false'; ?>;
 let fuelTable;
 let addRecordModal, detailModal, viewBillModal;
 
@@ -450,19 +457,24 @@ function initDataTable() {
             }},
             { data: null, render: function(d) {
                 const dataStr = JSON.stringify(d).replace(/"/g, '&quot;');
-                return `
+                let buttons = `
                     <div class="btn-group">
                         <button class="btn btn-sm btn-outline-info" onclick="openViewRecord(${dataStr})" title="ดูรายละเอียด">
                             <i class="fas fa-eye"></i>
-                        </button>
+                        </button>`;
+                
+                if (CAN_EDIT_DELETE) {
+                    buttons += `
                         <button class="btn btn-sm btn-outline-primary" onclick="openEditRecord(${dataStr})" title="แก้ไข">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${d.id})" title="ลบ">
                             <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                `;
+                        </button>`;
+                }
+                
+                buttons += `</div>`;
+                return buttons;
             }}
         ],
         responsive: true,
